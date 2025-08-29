@@ -1,0 +1,418 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takachain DApp</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Web3.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+</head>
+<body class="font-inter bg-gray-100 text-gray-800 antialiased min-h-screen flex flex-col">
+    <header class="bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold mb-2 md:mb-0">Takachain</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="home">Home</a></li>
+                    <!-- New 'About Avalanche' link added here -->
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="about-avalanche">About Avalanche</a></li>
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="core-wallet">Setting Up Core Wallet</a></li>
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="about">About Us</a></li>
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="contact">Contact Us</a></li>
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="picker-dashboard">Picker Dashboard</a></li>
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="recycler-dashboard">Recycler Dashboard</a></li>
+                    <li><a href="#" class="nav-link p-2 rounded-md hover:bg-white hover:text-green-600 transition-colors" data-page="transactions" id="transactions-nav-link">All Transactions</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6 flex-grow">
+        <!-- Connection Status -->
+        <div id="connection-status" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md shadow-sm mb-6 hidden" role="alert">
+            <p class="font-bold">Wallet Connection Status:</p>
+            <p id="account-display">Not Connected</p>
+            <p id="network-display"></p>
+            <button id="connect-wallet-btn" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">Connect Wallet</button>
+        </div>
+
+        <!-- Message Box -->
+        <div id="message-box" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <p id="message-text" class="text-lg font-semibold mb-4"></p>
+                <button id="message-close-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">OK</button>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="flex flex-col items-center p-4 rounded-lg bg-white shadow-xl">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <p class="mt-3 text-lg font-semibold text-blue-700">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Home Page -->
+        <section id="home-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 active">
+            <h2 class="text-4xl font-bold text-green-700 mb-6 text-center">Welcome to Takachain</h2>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                Takachain is a revolutionary decentralized application (DApp) built on the Avalanche testnet,
+                designed to incentivize and streamline plastic waste collection and recycling. Our mission
+                is to connect individuals who collect plastic waste ("Pickers"), or even citizens like you simply relaxing at home, with recycling companies, ensuring transparent and efficient payment for their valuable environmental efforts.
+            </p>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                By leveraging blockchain technology, Takachain provides a secure, immutable, and transparent
+                platform for tracking plastic deposits and managing payments. This fosters trust and
+                encourages greater participation in recycling initiatives, contributing to a cleaner,
+                greener planet.
+            </p>
+            <div class="flex justify-center mt-8">
+                <img src="takachainlogo.jpg" alt="Clean Environment" class="rounded-lg shadow-lg">
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-4">Join us in making a difference, one plastic bottle at a time!</p>
+        </section>
+
+        <!-- New 'About Avalanche' Page -->
+        <section id="about-avalanche-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-4xl font-bold text-green-700 mb-6 text-center">About Avalanche</h2>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                What is Avalanche? Avalanche is a decentralized, open source, Layer 1 blockchain platform, designed to support fast, scalable, and secure decentralized applications (dApps) and smart contracts.
+            </p>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                Avalanche’s architecture features three core blockchains. The X-Chain (Exchange Chain), C-Chain (Contract Chain), and P-Chain (Platform Chain), working together to respectively manage assets (sending of funds), smart contracts, and network coordination, making it a flexible competitor to platforms like Ethereum, Bitcoin, Base, Starknet, Tezos, Solana, Terra and Hyperledger Fabric.
+            </p>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                Known for its PoW (Proof of Work) Avalanche consensus algorithm, it blends classical as well as Nakamoto consensus methods to deliver high transaction speeds (throughput), low delays (latency), and strong decentralization, processing thousands of transactions per second with near instant finality.
+            </p>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                In order to use Avalanche, one uses a wallet called Core Wallet, Avalanche’s native wallet. Designed for speed and safety, it gives you a powerful multichain experience, letting you send and receive assets, connect to decentralized apps, and explore the Avalanche ecosystem without friction. With Core Wallet, you’re ready to dive into Web3 on Avalanche with confidence.
+            </p>
+        </section>
+
+        <!-- Setting Up Core Wallet Page -->
+        <section id="core-wallet-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-4xl font-bold text-blue-700 mb-6 text-center">Setting Up Core Wallet</h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-2xl font-semibold text-green-600 mb-3">Step 1: Install Core Extension</h3>
+                    <ol class="list-decimal list-inside text-lg leading-relaxed text-gray-700 space-y-2">
+                        <li>Open Google Chrome or any Chromium based browser (Brave, Edge, Opera).</li>
+                        <li>Go to the <a href="https://chrome.google.com/webstore/detail/core-wallet/jlmjfclfmcpfpfccpljkhhdhhggfdbck" target="_blank" class="text-blue-600 hover:underline">Core Chrome Web Store page</a>.</li>
+                        <li>Click Add to Chrome and confirm the installation.</li>
+                        <li>Once installed, you’ll see the Core icon in your browser’s extensions bar.</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-green-600 mb-3">Step 2: Create a Wallet</h3>
+                    <ol class="list-decimal list-inside text-lg leading-relaxed text-gray-700 space-y-2">
+                        <li>Click the Core icon in your browser.</li>
+                        <li>Select Create New Wallet.</li>
+                        <li>Set a strong password and confirm it.</li>
+                        <li>Write down your Secret Recovery Phrase and store it securely, do not share it with anyone.</li>
+                        <li>Confirm the recovery phrase to finish creating your wallet.</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-green-600 mb-3">Step 3: Connect Core Wallet to Avalanche Fuji Testnet</h3>
+                    <p class="text-lg leading-relaxed text-gray-700">Takachain is currently live on the Avalanche Fuji Testnet for testing.</p>
+                    <ol class="list-decimal list-inside text-lg leading-relaxed text-gray-700 space-y-2">
+                        <li>Open Core Wallet.</li>
+                        <li>Click the network dropdown (top of the wallet window).</li>
+                        <li>Select Fuji (Testnet) from the list.</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-green-600 mb-3">Step 4: Fund Your Wallet with Test Tokens</h3>
+                    <ol class="list-decimal list-inside text-lg leading-relaxed text-gray-700 space-y-2">
+                        <li>Copy your Core wallet address (starts with 0x...).</li>
+                        <li>Visit the <a href="https://faucet.avax.network/" target="_blank" class="text-blue-600 hover:underline">Avalanche Faucet</a>.</li>
+                        <li>Paste your address and request Fuji Test AVAX.</li>
+                        <li>Wait a few seconds — your balance should update in Core Wallet.</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-green-600 mb-3">Step 5: Connect Core Wallet to Takachain</h3>
+                    <ol class="list-decimal list-inside text-lg leading-relaxed text-gray-700 space-y-2">
+                        <li>Open the Takachain DApp/Website in your browser.</li>
+                        <li>Click Connect Wallet.</li>
+                        <li>Choose Core and approve the connection in the wallet popup.</li>
+                        <li>You’re ready to start using Takachain! 🎉</li>
+                    </ol>
+                </div>
+                <div class="bg-yellow-100 p-4 rounded-lg">
+                    <h4 class="text-xl font-semibold text-yellow-800 mb-2">Security Tips:</h4>
+                    <ul class="list-disc list-inside text-lg text-gray-700 space-y-1">
+                        <li>Never share your Secret Recovery Phrase with anyone.</li>
+                        <li>Only use the official Core extension from the Chrome Web Store.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Page -->
+        <section id="about-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-4xl font-bold text-green-700 mb-6 text-center">About Takachain</h2>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                Takachain was founded on the principle that technology can be a powerful tool for social and environmental good.
+                Our team is passionate about addressing the global plastic waste crisis and empowering communities.
+            </p>
+            <h3 class="text-2xl font-semibold text-blue-600 mb-3">Our Mission</h3>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                To create a transparent, efficient, and incentivized ecosystem for plastic waste collection
+                and recycling, fostering economic opportunities for individuals and promoting sustainable
+                practices globally.
+            </p>
+            <h3 class="text-2xl font-semibold text-blue-600 mb-3">Our Values</h3>
+            <ul class="list-disc list-inside text-lg leading-relaxed text-gray-700 mb-4">
+                <li>Transparency: All transactions are recorded on the blockchain, ensuring full visibility.</li>
+                <li>Empowerment: Providing direct financial incentives to plastic collectors.</li>
+                <li>Sustainability: Contributing to a circular economy and reducing environmental pollution.</li>
+                <li>Innovation: Leveraging cutting edge blockchain technology for real world impact.</li>
+            </ul>
+            <div class="flex justify-center mt-8">
+                <img src="aboutus1.jpeg" alt="Our Mission" class="rounded-lg shadow-lg">
+            </div>
+        </section>
+
+        <!-- Contact Us Page -->
+        <section id="contact-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-4xl font-bold text-green-700 mb-6 text-center">Contact Us</h2>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                We'd love to hear from you! Whether you have questions, feedback, or want to partner with us,
+                feel free to reach out.
+            </p>
+            <div class="space-y-4 text-lg text-gray-700">
+                <p><strong>Email:</strong> <a href="mailto:info@takachain.com" class="text-blue-600 hover:underline">info@takachain.com</a></p>
+                <p><strong>Phone:</strong> +254 751 741 935</p>
+                <p><strong>Address:</strong> Watermark Business Park, Ndege Road, Nairobi</p>
+                <p><strong>Social Media:</strong></p>
+                <ul class="list-disc list-inside ml-4">
+                    <li><a href="https://x.com/takachaindapp" class="text-blue-600 hover:underline">Twitter/X</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">LinkedIn</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">Facebook</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">TikTok</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">Instagram</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">Telegram</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">WhatsApp</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">Discord</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">YouTube</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">Spotify Podcast</a></li>
+                    <li><a href="#" class="text-blue-600 hover:underline">Reddit</a></li>
+                </ul>
+            </div>
+            <div class="flex justify-center mt-8">
+                <img src="contactus.jpg" alt="Contact Us" class="rounded-lg shadow-lg">
+            </div>
+        </section>
+
+        <!-- Picker Dashboard -->
+        <section id="picker-dashboard-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-4xl font-bold text-green-700 mb-6 text-center">Picker Dashboard</h2>
+            <div id="picker-info" class="mb-6 hidden">
+                <p class="text-xl font-semibold text-blue-600">Welcome, <span id="picker-name-display" class="font-bold"></span>!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Picker Registration -->
+                <div id="picker-registration-section" class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-2xl font-semibold text-blue-600 mb-4">Register as Picker</h3>
+                    <p id="picker-status" class="mb-4 text-gray-600">Status: Not Registered</p>
+                    <div class="mb-4">
+                        <label for="picker-name-input" class="block text-gray-700 text-sm font-bold mb-2">Your Name:</label>
+                        <input type="text" id="picker-name-input" class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your name">
+                    </div>
+                    <button id="register-picker-btn" class="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition-colors w-full">Register</button>
+                </div>
+
+                <!-- Request Recycler -->
+                <div id="request-recycler-section" class="bg-gray-50 p-6 rounded-lg shadow-inner hidden">
+                    <h3 class="text-2xl font-semibold text-blue-600 mb-4">Request Recycler for Deposit</h3>
+                    <p class="text-gray-700 mb-4">Create a request ID for your plastic deposit.</p>
+                    <button id="request-recycler-btn" class="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors w-full">Request Recycler</button>
+                    <p id="request-id-display" class="mt-4 text-center text-lg font-bold text-green-600 hidden">
+                        Your Deposit ID: <span id="deposit-id-value"></span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="text-2xl font-semibold text-blue-600 mb-4">Your Activity Reports</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Report 1: Total Plastics Deposited -->
+                    <div class="bg-purple-100 p-6 rounded-lg shadow-inner">
+                        <h4 class="text-xl font-semibold text-purple-700 mb-3">Total Plastics Deposited</h4>
+                        <p id="total-deposited-weight" class="text-3xl font-bold text-purple-900">0 grams</p>
+                        <p class="text-sm text-gray-600 mt-2">Sum of all plastic weight you've deposited.</p>
+                    </div>
+
+                    <!-- Report 2: Total AVAX Earnings -->
+                    <div class="bg-yellow-100 p-6 rounded-lg shadow-inner">
+                        <h4 class="text-xl font-semibold text-yellow-700 mb-3">Total AVAX Earnings</h4>
+                        <p id="total-avax-earnings" class="text-3xl font-bold text-yellow-900">0 AVAX</p>
+                        <p class="text-sm text-gray-600 mt-2">Total AVAX received from companies for your deposits.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="text-xl font-semibold text-blue-600 mb-3">Your Deposit History</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                            <thead class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+                                <tr>
+                                    <th class="py-3 px-6 text-left">Deposit ID</th>
+                                    <th class="py-3 px-6 text-left">Weight (g)</th>
+                                    <th class="py-3 px-6 text-left">Timestamp</th>
+                                    <th class="py-3 px-6 text-left">Verified</th>
+                                </tr>
+                            </thead>
+                            <tbody id="picker-deposits-table-body" class="text-gray-600 text-sm font-light">
+                                <!-- Deposits will be loaded here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recycler Dashboard -->
+        <section id="recycler-dashboard-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-4xl font-bold text-green-700 mb-6 text-center">Recycler Dashboard</h2>
+            <div id="recycler-info" class="mb-6 hidden">
+                <p class="text-xl font-semibold text-blue-600">Welcome, <span id="recycler-name-display" class="font-bold"></span>!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Recycler Registration -->
+                <div id="recycler-registration-section" class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-2xl font-semibold text-blue-600 mb-4">Register as Recycler</h3>
+                    <p id="recycler-status" class="mb-4 text-gray-600">Status: Not Registered</p>
+                    <div class="mb-4">
+                        <label for="recycler-name-input" class="block text-gray-700 text-sm font-bold mb-2">Your Name:</label>
+                        <input type="text" id="recycler-name-input" class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your name">
+                    </div>
+                    <button id="register-recycler-btn" class="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition-colors w-full">Register</button>
+                </div>
+
+                <!-- Deposit and Verify -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-2xl font-semibold text-blue-600 mb-4">Deposit & Verify Plastic</h3>
+                    <p class="text-gray-700 mb-4">Enter the Request ID from a Picker and the plastic weight.</p>
+                    <div class="mb-4">
+                        <label for="deposit-verify-id" class="block text-gray-700 text-sm font-bold mb-2">Deposit Request ID:</label>
+                        <input type="number" id="deposit-verify-id" class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., 1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="deposit-verify-weight" class="block text-gray-700 text-sm font-bold mb-2">Plastic Weight (grams):</label>
+                        <input type="number" id="deposit-verify-weight" class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., 1000">
+                    </div>
+                    <button id="deposit-verify-btn" class="bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors w-full">Deposit & Verify</button>
+                </div>
+
+                <!-- Make Payment -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner col-span-1 md:col-span-2">
+                    <h3 class="text-2xl font-semibold text-blue-600 mb-4">Make Payment to Picker</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="payment-deposit-id" class="block text-gray-700 text-sm font-bold mb-2">Deposit ID:</label>
+                            <input type="number" id="payment-deposit-id" class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., 1">
+                        </div>
+                        <div>
+                            <label for="payment-amount" class="block text-gray-700 text-sm font-bold mb-2">Amount (AVAX):</label>
+                            <input type="number" id="payment-amount" step="0.0001" class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., 0.1">
+                        </div>
+                    </div>
+                    <button id="make-payment-btn" class="bg-red-500 text-white px-6 py-3 rounded-md hover:bg-red-600 transition-colors w-full">Make Payment</button>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="text-2xl font-semibold text-blue-600 mb-4">Your Recycler Reports</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Report 1: Total AVAX Paid to Pickers -->
+                    <div class="bg-indigo-100 p-6 rounded-lg shadow-inner">
+                        <h4 class="text-xl font-semibold text-indigo-700 mb-3">Total AVAX Paid</h4>
+                        <p id="total-recycler-paid-avax" class="text-3xl font-bold text-indigo-900">0 AVAX</p>
+                        <p class="text-sm text-gray-600 mt-2">Total AVAX your recycler has paid to pickers.</p>
+                    </div>
+
+                    <!-- Report 2: Number of Verified Deposits -->
+                    <div class="bg-teal-100 p-6 rounded-lg shadow-inner">
+                        <h4 class="text-xl font-semibold text-teal-700 mb-3">Verified Deposits Count</h4>
+                        <p id="total-verified-deposits" class="text-3xl font-bold text-teal-900">0</p>
+                        <p class="text-sm text-gray-600 mt-2">Number of plastic deposits verified by your recycler.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="text-xl font-semibold text-blue-600 mb-3">Pending Requests (Unverified/Unpaid)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                            <thead class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+                                <tr>
+                                    <th class="py-3 px-6 text-left">Deposit ID</th>
+                                    <th class="py-3 px-6 text-left">Picker Address</th>
+                                    <th class="py-3 px-6 text-left">Weight (g)</th>
+                                    <th class="py-3 px-6 text-left">Timestamp</th>
+                                    <th class="py-3 px-6 text-left">Verified</th>
+                                    <th class="py-3 px-6 text-left">Paid</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pending-requests-table-body" class="text-gray-600 text-sm font-light">
+                                <!-- Pending requests will be loaded here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- All Transactions Page -->
+        <section id="transactions-page" class="page-content bg-white p-8 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-4xl font-bold text-green-700 mb-6 text-center">All Transactions</h2>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4">
+                This section displays a comprehensive list of all plastic deposit and payment transactions recorded on Takachain.
+            </p>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                    <thead class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+                        <tr>
+                            <th class="py-3 px-6 text-left">Deposit ID</th>
+                            <th class="py-3 px-6 text-left">Picker Address</th>
+                            <th class="py-3 px-6 text-left">Weight (g)</th>
+                            <th class="py-3 px-6 text-left">Deposit Time</th>
+                            <th class="py-3 px-6 text-left">Verified</th>
+                            <th class="py-3 px-6 text-left">Verifier</th>
+                            <th class="py-3 px-6 text-left">Paid</th>
+                            <th class="py-3 px-6 text-left">Payer</th>
+                            <th class="py-3 px-6 text-left">Amount Paid (AVAX)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-transactions-table-body" class="text-gray-600 text-sm font-light">
+                        <!-- Transactions will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 text-center mt-auto">
+        <div class="container mx-auto">
+            <p>
+  &copy; 2025 Takachain. All rights reserved. 
+  Built with <span class="text-red-500">&hearts;</span> for a cleaner planet 
+  by <a href="https://github.com/integerndegwa" target="_blank" class="text-blue-500 hover:underline">
+    Integer Ndegwa
+  </a>
+</p>
+        </div>
+    </footer>
+
+    <!-- Main Application JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

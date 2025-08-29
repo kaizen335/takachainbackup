@@ -1,0 +1,106 @@
+/* Custom CSS for Takachain DApp */
+
+/* Basic body styling, font, and background */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6; /* Tailwind gray-100 */
+    color: #374151; /* Tailwind gray-800 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh; /* Ensure body takes full viewport height */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header navigation links hover effect */
+.nav-link {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Active page content styling */
+.page-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Hidden page content */
+.page-content:not(.active) {
+    display: none;
+}
+
+/* Fade-in animation for page transitions */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* General button styling for better appearance */
+button {
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    border-radius: 0.375rem; /* Tailwind rounded-md */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Tailwind shadow-md */
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Input field focus styling */
+input:focus {
+    outline: none;
+    border-color: #3b82f6; /* Tailwind blue-500 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Tailwind focus-ring */
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 24px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb; /* Tailwind gray-200 */
+}
+
+th {
+    background-color: #e5e7eb; /* Tailwind gray-200 */
+    font-weight: 600;
+    color: #4b5563; /* Tailwind gray-700 */
+    text-transform: uppercase;
+    font-size: 0.75rem; /* Tailwind text-sm */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9fafb; /* Tailwind gray-50 */
+}
+
+tbody tr:hover {
+    background-color: #eff6ff; /* Tailwind blue-50 */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+    header nav ul li {
+        margin-bottom: 0.5rem;
+    }
+    .grid-cols-1.md\:grid-cols-2,
+    .grid-cols-1.md\:grid-cols-3 {
+        grid-template-columns: 1fr; /* Stack columns on small screens */
+    }
+    .col-span-1.md\:col-span-2,
+    .col-span-1.md\:col-span-3 {
+        grid-column: span 1 / span 1; /* Reset span on small screens */
+    }
+}
